@@ -5,7 +5,7 @@ inputs:
     description: 'Message to turn into a poem'
     required: true
 outputs:
-  poem: # id of output
+  poem:
     description: 'The poem'
 runs:
   using: 'docker'
