@@ -8,7 +8,7 @@ config = AutoConfig(
     max_new_tokens=77,
   )
 )
-llm = AutoModelForCausalLM.from_pretrained('./orca-mini-3b.ggmlv3.q4_0.bin', config=config)
+llm = AutoModelForCausalLM.from_pretrained('/action/orca-mini-3b.ggmlv3.q4_0.bin', config=config)
 
 commit_message = os.getenv('INPUT_COMMIT_MESSAGE')
 
