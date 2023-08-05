@@ -1,7 +1,6 @@
 from ctransformers import AutoModelForCausalLM, AutoConfig, Config
 import re
 import os
-import sys
 
 config = AutoConfig(
   model_type='llama',
@@ -35,3 +34,5 @@ POEM:
 result = str(llm(prompt))
 lines = result.split("\n")
 poem = re.sub("LINE_ONE: |LINE_TWO: |LINE_THREE: |LINE_FOUR: ", "", "\n".join(lines[:4]))
+
+os.environ['GITHUB_OUTPUT'] = f"poem={poem}"
