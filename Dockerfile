@@ -8,4 +8,4 @@ RUN curl -O -L https://huggingface.co/TheBloke/orca_mini_3B-GGML/resolve/main/or
 
 ENV TRANSFORMERS_OFFLINE=1
 
-CMD ["python", "-u", "/action/action.py"]
+ENTRYPOINT ["python", "-u", "/action/action.py"]
