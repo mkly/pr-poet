@@ -1,5 +1,9 @@
 name: 'PR Poet'
 description: 'Poestic musings for pull requests and other GitHub activity'
+author: 'Mike Lay'
+branding:
+  icon: 'book-open'
+  color: 'gray-dark'
 inputs:
   message:
     description: 'Message to turn into a poem'
