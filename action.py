@@ -1,4 +1,3 @@
-# from github import Github
 from ctransformers import AutoModelForCausalLM, AutoConfig, Config
 import re
 import os
