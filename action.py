@@ -35,4 +35,5 @@ result = str(llm(prompt))
 lines = result.split("\n")
 poem = re.sub("LINE_ONE: |LINE_TWO: |LINE_THREE: |LINE_FOUR: ", "", "\n".join(lines[:4]))
 
-os.environ['GITHUB_OUTPUT'] = f"poem={poem}"
+with open("$GITHUB_OUTPUT", "w") as file:
+    file.write(f"poem={poem}")
