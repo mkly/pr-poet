@@ -5,7 +5,7 @@ import os
 config = AutoConfig(
   model_type='llama',
   config=Config(
-    max_new_tokens=77,
+    max_new_tokens=89,
   )
 )
 llm = AutoModelForCausalLM.from_pretrained('/action/orca-mini-3b.ggmlv3.q4_0.bin', config=config)
