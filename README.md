@@ -2,12 +2,12 @@
 
 A Github action to turn commits and other comments into poetry
 
-A PR title of **_Add initial readme with title for proxy_** would yield something similar to:
+A PR title of **_Fix null handling, covered by integration tests_** would yield something similar to:
 
-> A vision to view from afar,<br/>
-> An image that glows with love,<br/>
-> An emote's face, a smile to show,<br/>
-> Online joy, a feeling so fine.
+> In code that handles null,<br/>
+> A test covers it all,<br/>
+> Null handled, no need to fret,</br>
+> Integration tested, a solid stand.</br>
 
 ## Example workflow usage
 
