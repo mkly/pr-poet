@@ -9,7 +9,7 @@ A PR title of **_Fix null handling, covered by integration tests_** would yield 
 > Null handled, no need to fret,</br>
 > Integration tested, a solid stand.</br>
 
-## Test is out
+## Test it out
 
 You can edit the `HELLO.md` file in this repo to open a new pull request and get a new poem.
 
