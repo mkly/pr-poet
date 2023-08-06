@@ -2,12 +2,12 @@
 
 A Github action to turn commits and other comments into poetry
 
-A PR title of **_Fix null handling, covered by integration tests_** would yield something similar to:
+A PR title of **_Fix silly typo in readme_** would yield something similar to:
 
-> In code that handles null,<br/>
-> A test covers it all,<br/>
-> Null handled, no need to fret,</br>
-> Integration tested, a solid stand.</br>
+> In reads that end with a whim,<br/>
+> A typo fixed, a happy sight,<br/>
+> Corrections made, a happy land,<br/>
+> Words' embrace in a happy space.<br/>
 
 ## Test it out
 
