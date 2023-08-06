@@ -36,4 +36,4 @@ lines = result.split("\n")
 poem = re.sub("LINE_ONE: |LINE_TWO: |LINE_THREE: |LINE_FOUR: ", "", "\n".join(lines[:4]))
 
 with open(os.getenv('GITHUB_OUTPUT', 'none.txt'), "w") as file:
-    file.write(f'poem=<<EOF\n{poem}\nEOF\n')
+    file.write(f'poem<<EOF\n{poem}\nEOF\n')
