@@ -68,6 +68,9 @@ runs:
           | sed 's/\[end of text\].*$//' \
           | sed -nE 's/^[[:space:]]*LINE_(ONE|TWO|THREE|FOUR):[[:space:]]*//p' \
           | head -n 4)"
+        echo "==== poem ===="
+        echo ${poem}
+        echo "=============="
         {
           echo 'poem<<EOF'
           echo "${poem}"
