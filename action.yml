@@ -55,7 +55,7 @@ runs:
         prompt="COMMIT: ${MESSAGE}"$'\nPOEM:\n'
         response="$(
           "${HOME}/.local/bin/llama" completion \
-            -hf ggml-org/gemma-4-E2B-it-GGUF:Q8_0 \
+            -hf bartowski/microsoft_Phi-4-mini-instruct-GGUF \
             -sys "${system_prompt}" \
             -p "${prompt}" \
             --jinja \
