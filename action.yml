@@ -10,7 +10,7 @@ inputs:
     required: true
 outputs:
   poem:
-    description: 'The poem as a JSON object with line_one through line_four'
+    description: 'The poem as four lines of plain text'
     value: ${{ steps.poet.outputs.poem }}
 runs:
   using: 'composite'
@@ -61,7 +61,7 @@ runs:
             --no-display-prompt
         )"
         final_response="${response##*<channel|>}"
-        poem="$(printf '%s\n' "${final_response}" \
+        poem_json="$(printf '%s\n' "${final_response}" \
           | sed 's/\[end of text\].*$//' \
           | jq -ce '
               if type == "object"
@@ -72,4 +72,9 @@ runs:
               then {line_one, line_two, line_three, line_four}
               else error("response is not a four-line poem JSON object")
               end')"
-        printf 'poem=%s\n' "${poem}" >> "${GITHUB_OUTPUT}"
+        poem="$(jq -r '.line_one, .line_two, .line_three, .line_four' <<< "${poem_json}")"
+        {
+          echo 'poem<<EOF'
+          printf '%s\n' "${poem}"
+          echo 'EOF'
+        } >> "${GITHUB_OUTPUT}"
