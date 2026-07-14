@@ -1,5 +1,5 @@
 name: 'PR Poet'
-description: 'Poestic musings for pull requests and other GitHub activity'
+description: 'Poetic musings for pull requests and other GitHub activity'
 author: 'Mike Lay'
 branding:
   icon: 'book-open'
@@ -11,8 +11,65 @@ inputs:
 outputs:
   poem:
     description: 'The poem'
+    value: ${{ steps.poet.outputs.poem }}
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
-  args:
-    - ${{ inputs.message }}
+  using: 'composite'
+  steps:
+    - name: Restore llama CLI and model caches
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.local/bin/llama
+          ~/.cache/huggingface
+          ~/.cache/llama.cpp
+        key: pr-poet-llama-${{ runner.os }}-${{ runner.arch }}-gemma-4-e2b-q8
+    - name: Install llama.cpp CLI
+      shell: bash
+      run: |
+        if [[ ! -x "${HOME}/.local/bin/llama" ]]; then
+          curl -LsSf https://llama.app/install.sh | sh
+        fi
+    - name: Write poem
+      id: poet
+      shell: bash
+      env:
+        MESSAGE: ${{ inputs.message }}
+      run: |
+        system_prompt="$(cat <<'SYSTEM_PROMPT'
+        COMMIT: Allow RSS feed to be cached if user is logged in.
+        POEM:
+        LINE_ONE: In feeds that dance on screens so bright,
+        LINE_TWO: A user logged, enjoys the sight,
+        LINE_THREE: Caching RSS, a seamless flow,
+        LINE_FOUR: Connection's embrace, a glow to show.
+
+        COMMIT: Bring back try/catch for 5.1
+        POEM:
+        LINE_ONE: In 5.1, a plea to mend,
+        LINE_TWO: Bring back try/catch, an old friend,
+        LINE_THREE: Errors caught, a graceful dance,
+        LINE_FOUR: Code's embrace in a second chance.
+
+        SYSTEM_PROMPT
+        )"
+        prompt="COMMIT: ${MESSAGE}"$'\nPOEM:\n'
+        response="$(
+          "${HOME}/.local/bin/llama" completion \
+            -hf ggml-org/gemma-4-E2B-it-GGUF:Q8_0 \
+            -sys "${system_prompt}" \
+            -p "${prompt}" \
+            --jinja \
+            --single-turn \
+            --log-disable \
+            --no-display-prompt
+        )"
+        final_response="${response##*<channel|>}"
+        poem="$(printf '%s\n' "${final_response}" \
+          | sed 's/\[end of text\].*$//' \
+          | sed -nE 's/^[[:space:]]*LINE_(ONE|TWO|THREE|FOUR):[[:space:]]*//p' \
+          | head -n 4)"
+        {
+          echo 'poem<<EOF'
+          echo "${poem}"
+          echo 'EOF'
+        } >> "${GITHUB_OUTPUT}"
