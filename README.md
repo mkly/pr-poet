@@ -2,6 +2,8 @@
 
 A Github action to turn commits and other comments into poetry
 
+This action installs the [llama.cpp](https://github.com/ggml-org/llama.cpp) CLI in the workflow and runs [Gemma 4 E2B Q8_0](https://huggingface.co/ggml-org/gemma-4-E2B-it-GGUF). The CLI downloads the model when the action runs.
+
 A PR title of **_Fix silly typo in readme_** would yield something similar to:
 
 > In reads that end with a whim,<br/>
@@ -33,7 +35,7 @@ jobs:
     steps:
       - name: PR Poet
         id: poet
-        uses: mkly/pr-poet@v1.0.9
+        uses: mkly/pr-poet@main
         with:
           message: ${{ github.event.pull_request.title }}
       - name: Post comment to PR

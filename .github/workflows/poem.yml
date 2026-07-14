@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: PR Poet
         id: poet
-        uses: mkly/pr-poet@v1.1.0
+        uses: mkly/pr-poet@main
         with:
           message: ${{ github.event.pull_request.title }}
       - name: Post comment to PR
