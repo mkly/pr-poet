@@ -56,7 +56,8 @@ runs:
             -sys "${system_prompt}" \
             -p "${prompt}" \
             --single-turn \
-            --log-disable \
+            --log-verbose \
+            --simple-io \
             --no-display-prompt
         )"
         final_response="${response##*<channel|>}"
