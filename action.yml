@@ -10,7 +10,7 @@ inputs:
     required: true
 outputs:
   poem:
-    description: 'The poem'
+    description: 'The poem as a JSON object with line_one through line_four'
     value: ${{ steps.poet.outputs.poem }}
 runs:
   using: 'composite'
@@ -37,22 +37,19 @@ runs:
       run: |
         system_prompt="$(cat <<'SYSTEM_PROMPT'
         COMMIT: Allow RSS feed to be cached if user is logged in.
-        POEM:
-        LINE_ONE: In feeds that dance on screens so bright,
-        LINE_TWO: A user logged, enjoys the sight,
-        LINE_THREE: Caching RSS, a seamless flow,
-        LINE_FOUR: Connection's embrace, a glow to show.
+        JSON:
+        {"line_one":"In feeds that dance on screens so bright,","line_two":"A user logged, enjoys the sight,","line_three":"Caching RSS, a seamless flow,","line_four":"Connection's embrace, a glow to show."}
 
         COMMIT: Bring back try/catch for 5.1
-        POEM:
-        LINE_ONE: In 5.1, a plea to mend,
-        LINE_TWO: Bring back try/catch, an old friend,
-        LINE_THREE: Errors caught, a graceful dance,
-        LINE_FOUR: Code's embrace in a second chance.
+        JSON:
+        {"line_one":"In 5.1, a plea to mend,","line_two":"Bring back try/catch, an old friend,","line_three":"Errors caught, a graceful dance,","line_four":"Code's embrace in a second chance."}
+
+        Return only a valid JSON object with string fields line_one, line_two,
+        line_three, and line_four. Do not use Markdown fences.
 
         SYSTEM_PROMPT
         )"
-        prompt="COMMIT: ${MESSAGE}"$'\nPOEM:\n'
+        prompt="COMMIT: ${MESSAGE}"$'\nJSON:\n'
         response="$(
           "${HOME}/.local/bin/llama" completion \
             -hf bartowski/microsoft_Phi-4-mini-instruct-GGUF \
@@ -66,13 +63,13 @@ runs:
         final_response="${response##*<channel|>}"
         poem="$(printf '%s\n' "${final_response}" \
           | sed 's/\[end of text\].*$//' \
-          | sed -nE 's/^[[:space:]]*LINE_(ONE|TWO|THREE|FOUR):[[:space:]]*//p' \
-          | head -n 4)"
-        echo "==== poem ===="
-        echo ${poem}
-        echo "=============="
-        {
-          echo 'poem<<EOF'
-          echo "${poem}"
-          echo 'EOF'
-        } >> "${GITHUB_OUTPUT}"
+          | jq -ce '
+              if type == "object"
+                and (.line_one | type == "string" and length > 0)
+                and (.line_two | type == "string" and length > 0)
+                and (.line_three | type == "string" and length > 0)
+                and (.line_four | type == "string" and length > 0)
+              then {line_one, line_two, line_three, line_four}
+              else error("response is not a four-line poem JSON object")
+              end')"
+        printf 'poem=%s\n' "${poem}" >> "${GITHUB_OUTPUT}"
