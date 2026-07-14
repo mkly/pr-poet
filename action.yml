@@ -52,10 +52,9 @@ runs:
         prompt="COMMIT: ${MESSAGE}"$'\nJSON:\n'
         response="$(
           "${HOME}/.local/bin/llama" completion \
-            -hf bartowski/microsoft_Phi-4-mini-instruct-GGUF \
+            -hf bartowski/microsoft_Phi-4-mini-instruct-GGUF:Q4_K_M \
             -sys "${system_prompt}" \
             -p "${prompt}" \
-            --jinja \
             --single-turn \
             --log-disable \
             --no-display-prompt
