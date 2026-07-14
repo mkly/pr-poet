@@ -61,6 +61,9 @@ runs:
             --no-display-prompt
         )"
         final_response="${response##*<channel|>}"
+        echo "======== RESPONSE ========"
+        echo "${response}"
+        echo "======== FINAL RESPONSE ========"
         poem_json="$(printf '%s\n' "${final_response}" \
           | sed 's/\[end of text\].*$//' \
           | jq -ce '
