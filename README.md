@@ -9,6 +9,10 @@
 > With fixes applied, clarity shines new,<br/>
 > Commit marked, code finds its view.<br/>
 
+## Edge Model
+
+The model inference uses about 600MB-900MB of memory and run completely within the GitHub Actions runner. There is no API call etc.
+
 ## Test it out
 
 You can edit the `HELLO.md` file in this repo to open a new pull request to get a new poem.
