@@ -18,3 +18,13 @@ Use this file to edit and create a PR to get a poem. Feel free to get creative w
      \ |
 \,/  ,\|,.  \,/
 ```
+
+```
+       .-",
+       `~||
+         ||___
+         (':.)`
+         || ||
+  jgs    || ||
+         ^^ ^^
+```
