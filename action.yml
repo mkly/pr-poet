@@ -22,7 +22,7 @@ runs:
           ~/.local/bin/llama
           ~/.cache/huggingface
           ~/.cache/llama.cpp
-        key: pr-poet-llama-${{ runner.os }}-${{ runner.arch }}-gemma-4-e2b-q8
+        key: pr-poet-llama-${{ runner.os }}-${{ runner.arch }}-qwen3-0.6b-q4-k-m
     - name: Install llama.cpp CLI
       shell: bash
       run: |
@@ -35,46 +35,72 @@ runs:
       env:
         MESSAGE: ${{ inputs.message }}
       run: |
-        system_prompt="$(cat <<'SYSTEM_PROMPT'
-        COMMIT: Allow RSS feed to be cached if user is logged in.
-        JSON:
-        {"line_one":"In feeds that dance on screens so bright,","line_two":"A user logged, enjoys the sight,","line_three":"Caching RSS, a seamless flow,","line_four":"Connection's embrace, a glow to show."}
+        prompt="$(cat <<PROMPT
+        <|im_start|>system
+        You turn Git commit messages into four-line poems.
 
-        COMMIT: Bring back try/catch for 5.1
-        JSON:
-        {"line_one":"In 5.1, a plea to mend,","line_two":"Bring back try/catch, an old friend,","line_three":"Errors caught, a graceful dance,","line_four":"Code's embrace in a second chance."}
+        Use exactly one rhyme scheme:
+        AABB: line 1 rhymes with line 2; line 3 rhymes with line 4.
+        ABAB: line 1 rhymes with line 3; line 2 rhymes with line 4.
+        ABBA: line 1 rhymes with line 4; line 2 rhymes with line 3.
 
-        Return only a valid JSON object with string fields line_one, line_two,
-        line_three, and line_four. Do not use Markdown fences.
+        A rhyme must use two different words with matching ending sounds.
+        All four lines must end with different words.
+        Repeating a line or ending word is invalid.
+        Vary the sentence structure. Do not use an internal comma in more than two lines.
 
-        SYSTEM_PROMPT
-        )"
-        prompt="COMMIT: ${MESSAGE}"$'\nJSON:\n'
+        Return exactly four lines, one poem line per line. Do not number the lines, and do not include a title, Markdown, or any text before or after the poem.<|im_end|>
+        <|im_start|>user
+        COMMIT: Retry failed artifact uploads after network timeout<|im_end|>
+        <|im_start|>assistant
+        When artifact uploads lose their flight,
+        A retry sends each payload right,
+        Through network storms the packets flow,
+        Past timeout gates they onward go.<|im_end|>
+        <|im_start|>user
+        COMMIT: ${MESSAGE}
+
+        Write the poem now. Use four different ending words and return only the four lines.<|im_end|>
+        <|im_start|>assistant
+        <think>
+
+        </think>
+
+        PROMPT
+        )"$'\n\n'
         response="$(
           "${HOME}/.local/bin/llama" completion \
-            -hf bartowski/google_gemma-4-E2B-it-GGUF:Q4_K_M \
-            -sys "${system_prompt}" \
+            -hf mkly/pr-poet-Q4_K_M.gguf \
             -p "${prompt}" \
-            --jinja \
+            -c 512 \
+            -n 96 \
+            --seed 42 \
+            --temp 0.7 \
+            --top-k 20 \
+            --top-p 0.9 \
+            --min-p 0 \
             --no-perf \
-            --single-turn \
             --no-warmup \
             --simple-io \
-            --no-display-prompt
+            --no-display-prompt \
+            --no-show-timings
         )"
-        final_response="${response##*<channel|>}"
-        poem_json="$(printf '%s\n' "${final_response}" \
-          | sed 's/\[end of text\].*$//' \
-          | jq -ce '
-              if type == "object"
-                and (.line_one | type == "string" and length > 0)
-                and (.line_two | type == "string" and length > 0)
-                and (.line_three | type == "string" and length > 0)
-                and (.line_four | type == "string" and length > 0)
-              then {line_one, line_two, line_three, line_four}
-              else error("response is not a four-line poem JSON object")
-              end')"
-        poem="$(jq -r '.line_one, .line_two, .line_three, .line_four' <<< "${poem_json}")"
+        poem="$(printf '%s\n' "${response}" | awk '
+          {
+            line = $0
+            sub(/^[[:space:]]*/, "", line)
+            sub(/[[:space:]]*$/, "", line)
+            sub(/^[-*•][[:space:]]*/, "", line)
+            sub(/^[0-9]+[.):][[:space:]]*/, "", line)
+            sub(/^[Ll][Ii][Nn][Ee][[:space:]]*[[:alnum:]_]+:[[:space:]]*/, "", line)
+            if (length(line) > 0) print line
+          }
+        ')"
+        line_count="$(printf '%s\n' "${poem}" | awk 'END { print NR }')"
+        if [[ "${line_count}" -ne 4 ]]; then
+          printf 'Expected four poem lines, got %s:\n%s\n' "${line_count}" "${response}" >&2
+          exit 1
+        fi
         {
           echo 'poem<<EOF'
           printf '%s\n' "${poem}"

@@ -9,7 +9,6 @@ permissions:
 jobs:
   post-poem-on-pr-open:
     runs-on: ubuntu-latest
-    environment: pull-requests
     steps:
       - name: PR Poet
         id: poet

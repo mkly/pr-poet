@@ -1,26 +1,24 @@
 # PR Poet
 
-A Github action to turn commits and other comments into poetry
+### A Github action to turn commits into poetry
 
-This action installs the [llama.cpp](https://github.com/ggml-org/llama.cpp) CLI in the workflow and runs [Gemma 4 E2B Q8_0](https://huggingface.co/ggml-org/gemma-4-E2B-it-GGUF). The CLI downloads the model when the action runs.
+**_Fix silly typo in readme_**:
 
-A PR title of **_Fix silly typo in readme_** would yield something similar to:
-
-> In reads that end with a whim,<br/>
-> A typo fixed, a happy sight,<br/>
-> Corrections made, a happy land,<br/>
-> Words' embrace in a happy space.<br/>
+> In README's pages where words reside,<br/>
+> A silly typo found, no longer inside,<br/>
+> With fixes applied, clarity shines new,<br/>
+> Commit marked, code finds its view.<br/>
 
 ## Test it out
 
-You can edit the `HELLO.md` file in this repo to open a new pull request and get a new poem.
+You can edit the `HELLO.md` file in this repo to open a new pull request to get a new poem.
 
 ## Example workflow usage
 
 ```
 name: Poems
 on:
-  # Use `pull_request_target` to view secrets
+  # This gives the workflow's GitHub token permission to comment on fork PRs.
   pull_request_target:
     types: [opened]
 
@@ -30,8 +28,6 @@ permissions:
 jobs:
   post-poem-on-pr-open:
     runs-on: ubuntu-latest
-    # Set to the environment with your personal access token
-    environment: pr-poet-token-env
     steps:
       - name: PR Poet
         id: poet
@@ -41,8 +37,7 @@ jobs:
       - name: Post comment to PR
         uses: actions/github-script@v6
         with:
-          # Add your personal access token to the PR comment request
-          github-token: ${{ secretes.PAT_TOKEN }}
+          github-token: ${{ github.token }}
           script: |
             await github.rest.issues.createComment({
               issue_number: context.issue.number,
@@ -51,3 +46,5 @@ jobs:
               body: `${{steps.poet.outputs.poem}}`
             })
 ```
+
+The workflow uses a custom fine-tuned 4bit quantized 0.6B model ([PR Poet Qwen3-0.6B Q4_K_M model](https://huggingface.co/mkly/pr-poet-Q4_K_M.gguf)) to be as small as possible while still creating a viable poem. See [mkly/pr-poet-training](https://github.com/mkly/pr-poet-training) for details on how the model was trained.
