@@ -87,6 +87,7 @@ runs:
             line = $0
             sub(/^[[:space:]]*/, "", line)
             sub(/[[:space:]]*$/, "", line)
+            sub(/[[:space:]]*\[end of text\]$/, "", line)
             sub(/^[-*•][[:space:]]*/, "", line)
             sub(/^[0-9]+[.):][[:space:]]*/, "", line)
             sub(/^[Ll][Ii][Nn][Ee][[:space:]]*[[:alnum:]_]+:[[:space:]]*/, "", line)
