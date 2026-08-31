@@ -74,16 +74,12 @@ runs:
             -p "${prompt}" \
             -c 512 \
             -n 96 \
-            --seed 42 \
             --temp 0.7 \
             --top-k 20 \
             --top-p 0.9 \
-            --min-p 0 \
-            --no-perf \
             --no-warmup \
             --simple-io \
-            --no-display-prompt \
-            --no-show-timings
+            --no-display-prompt
         )"
         poem="$(printf '%s\n' "${response}" | awk '
           {
